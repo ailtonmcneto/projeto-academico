@@ -108,18 +108,21 @@ def cadastrar_nota():
    
    
     if (matricula_aluno, codigo_disciplina) not in notas:
-        notas[(matricula_aluno, codigo_disciplina)] = {"notas": [] , "media": 0.0, "situacao": situacao}
+        notas[(matricula_aluno, codigo_disciplina)] = {"notas": [] , "media": 0.0, "situacao": ""}
     
     notas[(matricula_aluno, codigo_disciplina)]["notas"].append(nota)
     
     lista_notas = notas[(matricula_aluno, codigo_disciplina)]["notas"]
     media_notas, situacao = calcular_situacao(lista_notas)
 
+    notas[(matricula_aluno, codigo_disciplina)]["media"] = media_notas
+    notas[(matricula_aluno, codigo_disciplina)]["situação"] = situacao
+ 
     print(f"{media_notas:.2f} - {situacao} para o aluno {aluno[matricula_aluno]['nome']} na disciplina {disciplina[codigo_disciplina]['nome']}.")
-    if situacao == "Final":
-        modificacao_nota = input("O Aluno {} está em situação de Final. desejaria modificar alguma nota? (s/n): ".format(aluno[matricula_aluno]['nome']))
+    if situacao == "Sem nota suficiente":
+        modificacao_nota = input("O Aluno {} está em situação de Sem nota suficiente. desejaria modificar alguma nota? (s/n): ".format(aluno[matricula_aluno]['nome'])).lower().strip()
         if modificacao_nota == 's':
-            modificar_nota()
+            modificar_nota(matricula_aluno, codigo_disciplina, lista_notas, media_notas)
 
     while True:
         resposta = input("Deseja lançar outra nota? (s/n): ").lower().strip()
@@ -137,20 +140,52 @@ def calcular_situacao(lista_notas):
     if media_notas >= 7.0:
         situacao = "Aprovado"
     elif media_notas >= 4.0:
-        situacao = "Final"
+        situacao = "Sem nota suficiente"
     else:
         situacao = "Reprovado"
     return media_notas, situacao
 
+def modificar_nota(matricula_aluno, codigo_disciplina, lista_notas, media_notas):
+    print("Notas atuais do aluno {} na disciplina {}: {}".format(aluno[matricula_aluno]['nome'], disciplina[codigo_disciplina]['nome'], lista_notas))
+    while True:
+        try:
+            indice_nota = int(input("Digite o número da nota que deseja modificar (1, 2, ...): ")) - 1
+            if indice_nota < 0 or indice_nota >= len(lista_notas):
+                print("Índice de nota inválido.")
+                return
+            nova_nota = float(input("Digite a nova nota: "))
+            lista_notas[indice_nota] = nova_nota
+            media_notas, situacao = calcular_situacao(lista_notas)
+            notas[(matricula_aluno, codigo_disciplina)]["media"] = media_notas
+            notas[(matricula_aluno, codigo_disciplina)]["situação"] = situacao
+            print(f"Nota modificada. Nova média: {media_notas:.2f} - Situação: {situacao}.")
+            if situacao == "Sem nota suficiente":
+                resposta = input(f"O aluno {aluno[matricula_aluno]['nome']} ainda está sem nota suficiente. Deseja modificar outra nota? (s/n): ").lower().strip()
+                if resposta == 's':
+                    continue
+                elif resposta == 'n':
+                    break
+                else:
+                    break
+            if situacao == "Aprovado":
+                print("Aluno aprovado. Não é possível modificar mais notas.")
+                break
+            elif situacao == "Reprovado":                
+                print("Aluno reprovado. Não é possível modificar mais notas.")
+                break
+        except ValueError:
+            print("Valor inválido. Digite um número válido.")
+            
+
 while True:
-#loop presente com o menu de opções para o usuário
+
     print("="*30)
     print("DASHBOARD ACADÊMICO")
     print("="*30)   
     print('''
 ESCOLHA UMA OPÇÃO:
-1. Cadastrar curso
-2. Cadastrar disciplinaz
+1. Cadastrar curso 
+2. Cadastrar disciplina
 3. Cadastrar professor
 4. Cadastrar aluno
 5. Lançar nota
