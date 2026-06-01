@@ -72,8 +72,6 @@ def cadastrar_aluno():
   
     nome = str(input('Digite o nome do aluno: '))
   
-    
-   
     codigo_curso = input('Digite o código do curso: ').upper().strip()
     if codigo_curso not in curso:
         print("Curso não encontrado!")
@@ -108,18 +106,21 @@ def cadastrar_nota():
         print("Valor inválido. Digite uma nota válida.")
         return
    
-    notas[(matricula_aluno, codigo_disciplina)] = nota
+   
     if (matricula_aluno, codigo_disciplina) not in notas:
-        notas[(matricula_aluno, codigo_disciplina)] = []
-        lista_notas = notas[(matricula_aluno, codigo_disciplina)]
+        notas[(matricula_aluno, codigo_disciplina)] = {"notas": [] , "media": 0.0, "situacao": situacao}
+    
+    notas[(matricula_aluno, codigo_disciplina)]["notas"].append(nota)
+    
+    lista_notas = notas[(matricula_aluno, codigo_disciplina)]["notas"]
+    media_notas, situacao = calcular_situacao(lista_notas)
 
-    lista_notas = notas[(matricula_aluno, codigo_disciplina)]
-    lista_notas.append(nota)
-    media_notas = sum(lista_notas) / len(lista_notas)
-    if media_notas >= 6.0:
-        print(f"Aluno aprovado com média {media_notas:.2f}!")
-    print("Nota lançada com sucesso!")
-  
+    print(f"{media_notas:.2f} - {situacao} para o aluno {aluno[matricula_aluno]['nome']} na disciplina {disciplina[codigo_disciplina]['nome']}.")
+    if situacao == "Final":
+        modificacao_nota = input("O Aluno {} está em situação de Final. desejaria modificar alguma nota? (s/n): ".format(aluno[matricula_aluno]['nome']))
+        if modificacao_nota == 's':
+            modificar_nota()
+
     while True:
         resposta = input("Deseja lançar outra nota? (s/n): ").lower().strip()
         if resposta == 's':
@@ -129,6 +130,18 @@ def cadastrar_nota():
             break
         else:
             print("Resposta inválida. Digite 's' para sim ou 'n' para não.")
+
+def calcular_situacao(lista_notas):
+    
+    media_notas = sum(lista_notas) / len(lista_notas)
+    if media_notas >= 7.0:
+        situacao = "Aprovado"
+    elif media_notas >= 4.0:
+        situacao = "Final"
+    else:
+        situacao = "Reprovado"
+    return media_notas, situacao
+
 while True:
 #loop presente com o menu de opções para o usuário
     print("="*30)
@@ -137,7 +150,7 @@ while True:
     print('''
 ESCOLHA UMA OPÇÃO:
 1. Cadastrar curso
-2. Cadastrar disciplina
+2. Cadastrar disciplinaz
 3. Cadastrar professor
 4. Cadastrar aluno
 5. Lançar nota
