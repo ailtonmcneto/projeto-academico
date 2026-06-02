@@ -1,6 +1,5 @@
 from time import sleep
 
-#dicionários de cada área
 curso = {}
 disciplina = {}
 professor = {}
@@ -31,7 +30,6 @@ def cadastrar_disciplina():
         return
     
     codigo = "D" + str(len(disciplina) + 1)
-   
 
     nome = str(input('Digite o nome da disciplina: '))
     
@@ -69,7 +67,6 @@ def cadastrar_aluno():
   
     matricula = "A" + str(len(aluno) + 1)
 
-  
     nome = str(input('Digite o nome do aluno: '))
   
     codigo_curso = input('Digite o código do curso: ').upper().strip()
@@ -106,7 +103,6 @@ def cadastrar_nota():
         print("Valor inválido. Digite uma nota válida.")
         return
    
-   
     if (matricula_aluno, codigo_disciplina) not in notas:
         notas[(matricula_aluno, codigo_disciplina)] = {"notas": [] , "media": 0.0, "situacao": ""}
     
@@ -123,6 +119,8 @@ def cadastrar_nota():
         modificacao_nota = input("O Aluno {} está em situação de Sem nota suficiente. desejaria modificar alguma nota? (s/n): ".format(aluno[matricula_aluno]['nome'])).lower().strip()
         if modificacao_nota == 's':
             modificar_nota(matricula_aluno, codigo_disciplina, lista_notas, media_notas)
+
+    verificar_situacao_curso(matricula_aluno)
 
     while True:
         resposta = input("Deseja lançar outra nota? (s/n): ").lower().strip()
@@ -144,6 +142,23 @@ def calcular_situacao(lista_notas):
     else:
         situacao = "Reprovado"
     return media_notas, situacao
+
+def verificar_situacao_curso(matricula_aluno):
+    reprovado_em = []
+
+    for (mat, cod_disc), dados in notas.items():
+        if mat == matricula_aluno:
+            if dados.get("situação") == "Reprovado":
+                nome_disc = disciplina[cod_disc]['nome']
+                reprovado_em.append(nome_disc)
+
+    nome_aluno = aluno[matricula_aluno]['nome']
+
+    if reprovado_em:
+        print(f"⚠ {nome_aluno} está REPROVADO no curso.")
+        print(f"  Reprovado em: {', '.join(reprovado_em)}")
+    else:
+        print(f"✓ {nome_aluno} não possui reprovações no momento.")
 
 def modificar_nota(matricula_aluno, codigo_disciplina, lista_notas, media_notas):
     print("Notas atuais do aluno {} na disciplina {}: {}".format(aluno[matricula_aluno]['nome'], disciplina[codigo_disciplina]['nome'], lista_notas))
