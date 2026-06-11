@@ -11,7 +11,7 @@ media_notas = 0.0
 def cadastrar_curso():
 
     codigo_curso = "C" + str(len(curso) + 1)
-    nome = input('Digite o nome do curso: ')
+    nome = input('Digite o nome do curso: ').strip()
     
     curso[codigo_curso] = {'nome': nome}
     print(f"Curso '{nome}' cadastrado com o código {codigo_curso}!")
@@ -31,7 +31,7 @@ def cadastrar_disciplina():
     
     codigo_disciplina = "D" + str(len(disciplina) + 1)
 
-    nome = str(input('Digite o nome da disciplina: '))
+    nome = str(input('Digite o nome da disciplina: ')).strip()
     
     disciplina[codigo_disciplina] = {'nome': nome, 'curso': codigo_curso}
     print(f"Disciplina '{nome}' cadastrada com o código {codigo_disciplina}!")
@@ -45,7 +45,7 @@ def cadastrar_professor():
     
     matricula_professor = "P" + str(len(professor) + 1)
     
-    nome = str(input('Digite o nome do professor: '))
+    nome = str(input('Digite o nome do professor: ')).strip()
    
     codigo_disciplina = input('Digite o código da disciplina: ').upper().strip()
     if codigo_disciplina not in disciplina:
@@ -67,7 +67,7 @@ def cadastrar_aluno():
   
     matricula_aluno = "A" + str(len(aluno) + 1)
 
-    nome = str(input('Digite o nome do aluno: '))
+    nome = str(input('Digite o nome do aluno: ')).strip()
   
     codigo_curso = input('Digite o código do curso: ').upper().strip()
     if codigo_curso not in curso:
